@@ -1,8 +1,9 @@
 package com.example.virtualcamera
 
-import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Switch
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imgPreview: ImageView
     private lateinit var btnSelectImage: Button
     private lateinit var switchOverrideCamera: Switch
+    private lateinit var btnOpenSettings: Button
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { saveImageToInternalStorage(it) }
@@ -29,19 +31,26 @@ class MainActivity : AppCompatActivity() {
         imgPreview = findViewById(R.id.imgPreview)
         btnSelectImage = findViewById(R.id.btnSelectImage)
         switchOverrideCamera = findViewById(R.id.switchOverrideCamera)
+        btnOpenSettings = findViewById(R.id.btnOpenSettings) // Thêm nút chuyển cài đặt
 
-        loadExistingSettings()
+        loadExistingImage()
 
         btnSelectImage.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 
-        // Lưu trạng thái bật/tắt chiếm quyền vào SharedPreferences dùng chung cho Xposed Hook đọc
-        switchOverrideCamera.setOnCheckedChangeListener { _, isChecked ->
-            val prefs = getSharedPreferences("VirtualCameraPrefs", Context.MODE_WORLD_READABLE)
-            prefs.edit().putBoolean("is_override_active", isChecked).apply()
-            val statusText = if (isChecked) "Đã bật chiếm quyền camera!" else "Đã tắt chiếm quyền camera!"
-            Toast.makeText(this, statusText, Toast.LENGTH_SHORT).show()
+        // Bấm nút này sẽ chuyển thẳng sang Cài đặt quyền hiển thị đè hệ thống
+        btnOpenSettings.setOnClickListener {
+            if (!Settings.canDrawOverlays(this)) {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+                startActivity(intent)
+                Toast.makeText(this, "Vui lòng cấp quyền 'Hiển thị trên ứng dụng khác'", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Ứng dụng đã được cấp quyền hiển thị đè!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -60,13 +69,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadExistingSettings() {
+    private fun loadExistingImage() {
         val file = File(filesDir, "virtual_frame.jpg")
         if (file.exists()) {
             imgPreview.setImageURI(Uri.fromFile(file))
         }
-        // Đọc trạng thái switch cũ
-        val prefs = getSharedPreferences("VirtualCameraPrefs", Context.MODE_PRIVATE)
-        switchOverrideCamera.isChecked = prefs.getBoolean("is_override_active", false)
     }
 }
