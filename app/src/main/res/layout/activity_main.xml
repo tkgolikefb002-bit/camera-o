@@ -11,7 +11,7 @@
         android:id="@+id/imgPreview"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:layout_marginBottom="24dp`"
+        android:layout_marginBottom="24dp"
         android:background="#2d2d2d"
         android:scaleType="centerCrop" />
 
