@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Switch
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var imgPreview: ImageView
     private lateinit var btnSelectImage: Button
-    private lateinit var switchOverrideCamera: Switch
     private lateinit var btnOpenSettings: Button
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -30,8 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         imgPreview = findViewById(R.id.imgPreview)
         btnSelectImage = findViewById(R.id.btnSelectImage)
-        switchOverrideCamera = findViewById(R.id.switchOverrideCamera)
-        btnOpenSettings = findViewById(R.id.btnOpenSettings) // Thêm nút chuyển cài đặt
+        btnOpenSettings = findViewById(R.id.btnOpenSettings)
 
         loadExistingImage()
 
@@ -39,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             pickImageLauncher.launch("image/*")
         }
 
-        // Bấm nút này sẽ chuyển thẳng sang Cài đặt quyền hiển thị đè hệ thống
+        // Bấm nút chuyển thẳng sang Cài đặt quyền hiển thị đè hệ thống
         btnOpenSettings.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
                 val intent = Intent(
