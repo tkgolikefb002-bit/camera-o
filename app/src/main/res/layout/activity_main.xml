@@ -9,9 +9,9 @@
 
     <ImageView
         android:id="@+id/imgPreview"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginBottom="20dp"
         android:background="#2d2d2d"
         android:scaleType="centerCrop" />
 
@@ -22,16 +22,16 @@
         android:backgroundTint="#4CAF50"
         android:text="Chọn ảnh thay thế camera"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="12dp"/>
 
-    <Switch
-        android:id="@+id/switchOverrideCamera"
+    <!-- Nút bấm chuyển sang cài đặt quyền hệ thống -->
+    <Button
+        android:id="@+id/btnOpenSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bật chiếm quyền camera toàn hệ thống"
+        android:backgroundTint="#FF9800"
+        android:text="Mở cài đặt quyền hệ thống"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:background="#2d2d2d"/>
+        android:layout_marginBottom="16dp"/>
 
 </LinearLayout>
