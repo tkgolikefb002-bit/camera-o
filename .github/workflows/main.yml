@@ -22,11 +22,42 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    # 3. Tự động tải tệp gradle-wrapper.jar còn thiếu và cấp quyền chạy cho gradlew
-    - name: Auto Setup Gradle Wrapper
+    # 3. Tự động thiết lập Gradle Wrapper sạch sẽ (tải cả jar và tạo lại gradlew chuẩn Linux)
+    - name: Setup Gradle Wrapper Properly
       run: |
         mkdir -p gradle/wrapper
         curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/subprojects/wrapper/src/unshaded/resources/gradle-wrapper.jar
+        
+        # Tự tạo lại tệp gradlew chuẩn định dạng Linux (LF) trực tiếp tại đây
+        cat << 'EOF' > gradlew
+        #!/usr/bin/env sh
+        DEFAULT_JVM_OPTS=""
+        JAVACMD="java"
+        app_name="Gradle"
+        app_command="gradlew"
+        
+        # Attempt to set APP_HOME
+        PRG="$0"
+        while [ -h "$PRG" ] ; do
+            ls=`ls -ld "$PRG"`
+            link=`expr "$ls" : '.*-> \(.*\)$'`
+            expr "$link" : '/.*' > /dev/null || link=`dirname "$PRG"`/"$link"
+            PRG="$link"
+        st done 2>/dev/null || true
+        done
+        
+        SAVED="`pwd`"
+        cd "`dirname "$PRG"`" >/dev/null
+        APP_HOME="`pwd -P`"
+        cd "$SAVED" >/dev/null
+        
+        CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+        
+        exec "$JAVACMD" \
+            -classpath "$CLASSPATH" \
+            org.gradle.wrapper.GradleWrapperMain "$@"
+        EOF
+
         chmod +x gradlew
 
     # 4. Tiến hành build tệp APK bản Debug
