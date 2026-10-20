@@ -22,49 +22,18 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    # 3. Tự động thiết lập Gradle Wrapper sạch sẽ (tải cả jar và tạo lại gradlew chuẩn Linux)
-    - name: Setup Gradle Wrapper Properly
+    # 3. Tự động tải và cài đặt trực tiếp Gradle phiên bản 8.4
+    - name: Install Gradle Directly
       run: |
-        mkdir -p gradle/wrapper
-        curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/subprojects/wrapper/src/unshaded/resources/gradle-wrapper.jar
-        
-        # Tự tạo lại tệp gradlew chuẩn định dạng Linux (LF) trực tiếp tại đây
-        cat << 'EOF' > gradlew
-        #!/usr/bin/env sh
-        DEFAULT_JVM_OPTS=""
-        JAVACMD="java"
-        app_name="Gradle"
-        app_command="gradlew"
-        
-        # Attempt to set APP_HOME
-        PRG="$0"
-        while [ -h "$PRG" ] ; do
-            ls=`ls -ld "$PRG"`
-            link=`expr "$ls" : '.*-> \(.*\)$'`
-            expr "$link" : '/.*' > /dev/null || link=`dirname "$PRG"`/"$link"
-            PRG="$link"
-        st done 2>/dev/null || true
-        done
-        
-        SAVED="`pwd`"
-        cd "`dirname "$PRG"`" >/dev/null
-        APP_HOME="`pwd -P`"
-        cd "$SAVED" >/dev/null
-        
-        CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
-        
-        exec "$JAVACMD" \
-            -classpath "$CLASSPATH" \
-            org.gradle.wrapper.GradleWrapperMain "$@"
-        EOF
+        wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
+        unzip -q gradle-8.4-bin.zip
+        echo "$PWD/gradle-8.4/bin" >> $GITHUB_PATH
 
-        chmod +x gradlew
-
-    # 4. Tiến hành build tệp APK bản Debug
+    # 4. Tiến hành build tệp APK bản Debug trực tiếp bằng lệnh gradle
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: gradle assembleDebug
 
-    # 5. Lưu tệp APK sau khi build thành công
+    # 5. Lưu tệp APK sau khi build thành công thành Artifact
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
